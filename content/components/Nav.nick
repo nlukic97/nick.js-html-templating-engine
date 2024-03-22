@@ -1,0 +1,4 @@
+<nav>
+    <a href="/">home</a>
+    <a href="/pageNotFound">404 page</a>
+</nav>

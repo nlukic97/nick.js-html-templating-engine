@@ -1,35 +1,36 @@
-// now try to replace this actually
-/* function renderContent(content){
-    return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    </head>
-    <body>
-    ${content}
-    </body>
-    </html>
-    `
-} */
-
 const fs = require('node:fs');
 
 
-function renderContent(content){
-    return new Promise((resolve, reject)=>{
-        fs.readFile('./content/code.html', 'utf8', (err, data) => {
-            if (err) {
-                return reject(err)
+function render(path){
+    return new Promise(async (resolve, reject)=>{        
+        try {
+            // getting html code
+            let indexPage = await fs.promises.readFile(path, 'utf8')
+            
+            // finding all text in html code such as <@components/Nav.nick> that 
+            // need to be replaed with the real component
+            const componentRegex = /<@([^>]+)>/g;
+            const componentsToReplace = [];
+
+            let match;
+            while ((match = componentRegex.exec(indexPage)) !== null) {
+                componentsToReplace.push({ fullMatch: match[0], componentPath: match[1] });
             }
 
-            data = data.replace('<!-- $content$ -->',content)
-            return resolve(data)
-        })
+            // going through each found component import, and replacing it with code found
+            // in component filepath
+            for (const component of componentsToReplace) {
+                const content = await fs.promises.readFile(`./content/${component.componentPath}`, 'utf8');
+                indexPage = indexPage.replace(component.fullMatch, content);
+            }
+
+            // returning full html code
+            return resolve(indexPage)
+        } catch(err){
+            return reject('500 - Server Error')
+        }
     })
     
 }
 
-module.exports = {renderContent}
+module.exports = {render}
