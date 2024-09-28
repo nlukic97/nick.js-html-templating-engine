@@ -1,1 +1,6 @@
-<h1>Home page</h1>
+<div style="border:1px solid black;margin-left:10px;">
+    <h1>Home page</h1>
+    <p>I am Content.nick,selected to be rendered at route"/"</p>
+    
+    <@components/subcomponent/Address.nick>
+</div>

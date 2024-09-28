@@ -17,9 +17,15 @@ function renderHtml(path) {
     }
 }
 
+// added this as a middleware example
+function test(req,res,next){
+    next()
+}
+
+
 // Routes
-app.get('/', renderHtml('./content/index.html'));
-app.get('/about', renderHtml('./content/about.html'));
+app.get('/', test, renderHtml('./content/index.html'));
+app.get('/about', test, renderHtml("./content/about.html"));
 
 
 server.listen(3000, () => console.log('Server running at http://localhost:3000'));

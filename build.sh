@@ -1,48 +1,56 @@
 #!/bin/bash
 
-# Define paths to content files
-INDEX_PAGE_PATH="./content/index.html"
-CONTENT_COMPONENT_PATH="./content/components/Content.nick"
-NAV_COMPONENT_PATH="./content/components/Nav.nick"
-BUILD_PATH="./build/index.html"
-
-# Check if all required files exist
-if [[ ! -f "$INDEX_PAGE_PATH" ]]; then
-    echo "Error: $INDEX_PAGE_PATH not found."
-    exit 1
+# Step 1: Check if the build directory exists, create it if it doesn't
+if [ ! -d "./build" ]; then
+  mkdir ./build
 fi
 
-if [[ ! -f "$CONTENT_COMPONENT_PATH" ]]; then
-    echo "Error: $CONTENT_COMPONENT_PATH not found."
-    exit 1
-fi
+# Step 2: Extract paths passed to renderHtml() from index.js
+index_js="index.js"
 
-if [[ ! -f "$NAV_COMPONENT_PATH" ]]; then
-    echo "Error: $NAV_COMPONENT_PATH not found."
-    exit 1
-fi
+# Helper function to replace components in HTML
+replace_components() {
+  local file_path="$1"
+  local index_page
+  index_page=$(<"$file_path")
 
-# Read files into variables
-indexPage=$(<"$INDEX_PAGE_PATH")
-contentCode=$(<"$CONTENT_COMPONENT_PATH")
-navCode=$(<"$NAV_COMPONENT_PATH")
+  # Find all components in the form <@components/componentName>
+  while [[ $index_page =~ (<@([^>]+)>) ]]; do
+    full_match="${BASH_REMATCH[1]}"
+    component_path="${BASH_REMATCH[2]}"
+    component_file="./content/$component_path"
 
-# Replace placeholders with content
-fullData="${indexPage//<Content\/>/$contentCode}"
-fullData="${fullData//<Nav\/>/$navCode}"
+    # Check if the component file exists
+    if [ -f "$component_file" ]; then
+      # Read the content of the component file
+      component_content=$(<"$component_file")
 
-# Create build directory if it doesn't exist
-if [[ ! -d "./build" ]]; then
-    mkdir -p "./build"
-fi
+      # Replace the full match (e.g., <@components/Nav.nick>) with the content
+      index_page="${index_page//$full_match/$component_content}"
+    else
+      echo "Component file not found: $component_file"
+    fi
+  done
 
-# Write the result to the build path
-echo "$fullData" > "$BUILD_PATH"
+  echo "$index_page"
+}
 
-# Check if the file was written successfully
-if [[ $? -eq 0 ]]; then
-    echo "Build completed: $BUILD_PATH"
-else
-    echo "Error: Failed to write to $BUILD_PATH"
-    exit 1
-fi
+# Loop through each route in index.js
+while IFS= read -r line; do
+  # Extract the file path from the renderHtml argument
+  if [[ $line =~ renderHtml\(\ *[\'\"]([^\"]+)[\'\"]\ *\) ]]; then
+    file_path="${BASH_REMATCH[1]}"
+    output_file=$(basename "$file_path" .html)
+
+    # Step 3: Call replace_components to render the HTML and replace components
+    rendered_content=$(replace_components "$file_path")
+
+    # Step 4: Write the rendered content to the ./build directory
+    if [ -n "$rendered_content" ]; then
+      echo "$rendered_content" > "./build/$output_file.html"
+      echo "Rendered content written to ./build/$output_file.html"
+    else
+      echo "Error rendering $file_path"
+    fi
+  fi
+done < "$index_js"

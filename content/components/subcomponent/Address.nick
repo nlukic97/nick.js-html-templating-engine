@@ -1,0 +1,4 @@
+<div style="color:red;border:1px solid red;margin-left:10px;">
+    I am the Address.nick component inside Content.nick
+    <@components/subcomponent/addresscomponents/City.nick>
+</div>
