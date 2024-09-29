@@ -57,10 +57,3 @@ npm run build
 ```
 
 this will output all html files in the `./build` directory.
-
-
-
-
-
-
-6. Now, when you access
