@@ -13,7 +13,7 @@ index_js="index.js"
 replace_components() {
   local file_path="$1"
   local index_page
-  index_page=$(<"$file_path")
+  index_page=$(<"./src/views/$file_path")
 
   # Find all components in the form <@components/componentName>
   while [[ $index_page =~ (<@([^>]+)>) ]]; do
