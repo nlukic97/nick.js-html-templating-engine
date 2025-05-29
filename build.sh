@@ -1,3 +1,4 @@
+# @todo make this work
 #!/bin/bash
 
 # Step 1: Check if the build directory exists, create it if it doesn't
@@ -18,7 +19,7 @@ replace_components() {
   while [[ $index_page =~ (<@([^>]+)>) ]]; do
     full_match="${BASH_REMATCH[1]}"
     component_path="${BASH_REMATCH[2]}"
-    component_file="./src/$component_path"
+    component_file="./src/views/$component_path"
 
     # Check if the component file exists
     if [ -f "$component_file" ]; then
