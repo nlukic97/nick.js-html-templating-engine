@@ -27,7 +27,7 @@ The contents of page.html will now be available at the `/page` route.
 To use components, first create a `.nick` component file in the `./src/components` directory:
 
 ```sh
-touch ./content/components/Component.nick
+touch ./src/components/Component.nick
 ```
 
 and add some html code to the component. Example:
