@@ -18,7 +18,7 @@ replace_components() {
   while [[ $index_page =~ (<@([^>]+)>) ]]; do
     full_match="${BASH_REMATCH[1]}"
     component_path="${BASH_REMATCH[2]}"
-    component_file="./content/$component_path"
+    component_file="./src/$component_path"
 
     # Check if the component file exists
     if [ -f "$component_file" ]; then
@@ -38,7 +38,7 @@ replace_components() {
 # Loop through each route in index.js
 while IFS= read -r line; do
   # Extract the file path from the renderHtml argument
-  if [[ $line =~ renderHtml\(\ *[\'\"]([^\"]+)[\'\"]\ *\) ]]; then
+  if [[ $line =~ view\(\ *[\'\"]([^\"]+)[\'\"]\ *\) ]]; then
     file_path="${BASH_REMATCH[1]}"
     output_file=$(basename "$file_path" .html)
 

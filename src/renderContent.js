@@ -23,7 +23,7 @@ function render(path){
                 // going through each found component import, and replacing it with code found
                 // in component filepath
                 for (const component of componentsToReplace) {
-                    const content = await fs.promises.readFile(`./content/${component.componentPath}`, 'utf8');
+                    const content = await fs.promises.readFile(`./src/${component.componentPath}`, 'utf8');
                     indexPage = indexPage.replace(component.fullMatch, content);
                 }
 
@@ -43,4 +43,15 @@ function render(path){
     
 }
 
-module.exports = {render}
+// method used to render a custom page
+function renderHtml(path) {
+    return async (_,res)=>{
+        try {
+            return res.send(await render(path));
+        } catch(err){
+            return res.status(500).end(err)
+        }
+    }
+}
+
+module.exports = {view: renderHtml}
